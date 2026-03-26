@@ -163,3 +163,34 @@ h1 {
         width: 100%;
     }
 }
+
+.stats-card {
+    max-width: 800px;
+}
+
+.section-title {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    color: #f1f1f1;
+}
+
+.click-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.click-item {
+    background-color: #222;
+    border: 1px solid #3f3f3f;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.click-item p {
+    margin: 6px 0;
+    color: #d1d5db;
+    font-size: 14px;
+}

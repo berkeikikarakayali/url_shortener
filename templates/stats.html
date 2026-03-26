@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Stats</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="page">
+        <div class="card stats-card">
+            <h1>URL Stats</h1>
+            <p class="subtitle">Analytics for your shortened link</p>
+
+            <div class="result-box">
+                <p class="original-url"><strong>Short Code:</strong> {{ short_code }}</p>
+                <p class="original-url"><strong>Original URL:</strong> {{ original_url }}</p>
+                <p class="original-url"><strong>Total Clicks:</strong> {{ total_clicks }}</p>
+                <p class="original-url"><strong>Created At:</strong> {{ created_at }}</p>
+            </div>
+
+            <h2 class="section-title">Click Events</h2>
+
+            {% if click_events %}
+                <div class="click-list">
+                    {% for click in click_events %}
+                    <div class="click-item">
+                        <p><strong>IP:</strong> {{ click.ip_address }}</p>
+                        <p><strong>Device:</strong> {{ click.device_type }}</p>
+                        <p><strong>Browser:</strong> {{ click.browser }}</p>
+                        <p><strong>Clicked At:</strong> {{ click.clicked_at }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="result-box">
+                    <p>No clicks yet.</p>
+                </div>
+            {% endif %}
+
+            <div class="actions">
+                <a href="/" class="stats-btn">Back Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -82,8 +82,8 @@ async def shorten_url_form(
     )
 
 
-@app.get("/stats/{short_code}")
-async def get_url_stats(short_code: str, db: AsyncSession = Depends(get_db)):
+@app.get("/stats/{short_code}", response_class=HTMLResponse)
+async def get_url_stats(request: Request, short_code: str, db: AsyncSession = Depends(get_db)):
     url = await ShortenerService.get_by_code(db, short_code)
 
     if not url:
@@ -103,13 +103,18 @@ async def get_url_stats(short_code: str, db: AsyncSession = Depends(get_db)):
             "clicked_at": click.clicked_at
         })
 
-    return {
-        "original_url": url.original_url,
-        "short_code": url.short_code,
-        "total_clicks": url.total_clicks,
-        "created_at": url.created_at,
-        "click_events": clicks_data
-    }
+    return templates.TemplateResponse(
+        request=request,
+        name="stats.html",
+        context={
+            "request": request,
+            "original_url": url.original_url,
+            "short_code": url.short_code,
+            "total_clicks": url.total_clicks,
+            "created_at": url.created_at,
+            "click_events": clicks_data
+        }
+    )
 
 
 @app.get("/{short_code}")
