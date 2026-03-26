@@ -37,6 +37,34 @@ async def shorten_url(original_url: str, db: AsyncSession = Depends(get_db)):
     "short_url": f"{BASE_URL}/{new_url.short_code}"
     }
 
+@app.get("/stats/{short_code}")
+async def get_url_stats(short_code: str, db: AsyncSession = Depends(get_db)):
+    url = await ShortenerService.get_by_code(db, short_code)
+
+    if not url:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    clicks = await AnalyticsService.get_clicks_for_url(db, url.id)
+
+    clicks_data = []
+    for click in clicks:
+        clicks_data.append({
+            "id": click.id,
+            "ip_address": click.ip_address,
+            "user_agent": click.user_agent,
+            "country": click.country,
+            "device_type": click.device_type,
+            "clicked_at": click.clicked_at
+        })
+
+    return {
+        "original_url": url.original_url,
+        "short_code": url.short_code,
+        "total_clicks": url.total_clicks,
+        "created_at": url.created_at,
+        "click_events": clicks_data
+    }
+
 @app.get("/{short_code}")
 async def redirect_to_original(
     short_code: str,

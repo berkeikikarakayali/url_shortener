@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from models import ClickEvent, ShortenedURL
 
 
@@ -25,3 +26,10 @@ class AnalyticsService:
         await db.refresh(click)
 
         return click
+
+    @staticmethod
+    async def get_clicks_for_url(db: AsyncSession, url_id: int) -> list[ClickEvent]:
+        result = await db.execute(
+            select(ClickEvent).where(ClickEvent.url_id == url_id)
+        )
+        return result.scalars().all()
