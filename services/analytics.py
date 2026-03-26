@@ -11,14 +11,16 @@ class AnalyticsService:
         ip_address: str | None = None,
         user_agent: str | None = None,
         country: str | None = None,
-        device_type: str | None = None
+        device_type: str | None = None,
+        browser: str | None = None
     ) -> ClickEvent:
         click = ClickEvent(
             url_id=url.id,
             ip_address=ip_address,
             user_agent=user_agent,
             country=country,
-            device_type=device_type
+            device_type=device_type,
+            browser=browser
         )
 
         db.add(click)

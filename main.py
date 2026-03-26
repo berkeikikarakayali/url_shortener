@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from database import engine, Base, get_db
 from services.shortener import ShortenerService
 from services.analytics import AnalyticsService
+from services.device import DeviceService
 import models
 import os
 
@@ -98,6 +99,7 @@ async def get_url_stats(short_code: str, db: AsyncSession = Depends(get_db)):
             "user_agent": click.user_agent,
             "country": click.country,
             "device_type": click.device_type,
+            "browser": click.browser,
             "clicked_at": click.clicked_at
         })
 
@@ -124,11 +126,15 @@ async def redirect_to_original(
     client_ip = request.client.host if request.client else None
     user_agent = request.headers.get("user-agent")
 
+    device_info = DeviceService.parse_user_agent(user_agent)
+
     await AnalyticsService.record_click(
         db=db,
         url=url,
         ip_address=client_ip,
-        user_agent=user_agent
+        user_agent=user_agent,
+        device_type=device_info["device_type"],
+        browser=device_info["browser"]
     )
 
     await ShortenerService.increment_click_count(db, url)

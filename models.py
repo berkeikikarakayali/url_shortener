@@ -26,6 +26,7 @@ class ClickEvent(Base):
     user_agent = Column(Text, nullable=True)
     country = Column(String(100), nullable=True)
     device_type = Column(String(50), nullable=True)
+    browser = Column(String(100), nullable=True)
 
     clicked_at = Column(DateTime, default=datetime.utcnow)
 
