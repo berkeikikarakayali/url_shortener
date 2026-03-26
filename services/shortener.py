@@ -35,3 +35,10 @@ class ShortenerService:
         await db.refresh(new_url)
 
         return new_url
+
+    @staticmethod
+    async def get_by_code(db: AsyncSession, short_code: str) -> ShortenedURL | None:
+        result = await db.execute(
+            select(ShortenedURL).where(ShortenedURL.short_code == short_code)
+        )
+        return result.scalar_one_or_none()
