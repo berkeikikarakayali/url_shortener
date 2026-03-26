@@ -4,40 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>URL Shortener</h1>
+    <div class="page">
+        <div class="card">
+            <h1>URL Shortener</h1>
+            <p class="subtitle">Shorten long URLs and track clicks.</p>
 
-        <form action="/shorten-form" method="post" class="shorten-form">
-            <input type="text" name="original_url" placeholder="https://example.com" required>
-            <button type="submit">Shorten</button>
-        </form>
+            <form action="/shorten-form" method="post" class="shorten-form">
+                <input type="text" name="original_url" placeholder="https://example.com" required>
+                <button type="submit">Shorten</button>
+            </form>
 
-        {% if short_url %}
-        <div class="result">
-            <p><strong>Short Link:</strong></p>
-            <a href="{{ short_url }}" target="_blank" id="shortUrl">{{ short_url }}</a>
+            {% if short_url %}
+            <div class="result-box">
+                <p class="label">Short URL</p>
 
-            <div class="result-actions">
-                <button type="button" onclick="copyShortUrl()">Copy</button>
+                <div class="short-url-wrapper">
+                    <a href="{{ short_url }}" target="_blank" id="shortUrl">{{ short_url }}</a>
+                </div>
+
+                <div class="actions">
+                    <button type="button" id="copyButton" onclick="copyShortUrl()">Copy</button>
+                    <a href="/stats/{{ short_code }}" target="_blank" class="stats-btn">View Stats</a>
+                </div>
+
+                <p class="original-url">
+                    <strong>Original:</strong> {{ original_url }}
+                </p>
             </div>
+            {% endif %}
 
-            <div class="small">
-                Original URL: {{ original_url }}
+            {% if error %}
+            <div class="error-box">
+                {{ error }}
             </div>
-            <div class="small">
-                Statistics: <a href="/stats/{{ short_code }}" target="_blank">/stats/{{ short_code }}</a>
-            </div>
+            {% endif %}
         </div>
-        {% endif %}
-
-        {% if error %}
-        <div class="error">
-            {{ error }}
-        </div>
-        {% endif %}
     </div>
 
     <script src="/static/js/app.js"></script>

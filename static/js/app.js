@@ -1,15 +1,27 @@
 function copyShortUrl() {
-    const shortUrlElement = document.getElementById("shortUrl");
+    const shortUrl = document.getElementById("shortUrl");
+    const copyButton = document.getElementById("copyButton");
 
-    if (!shortUrlElement) return;
+    if (!shortUrl || !copyButton) return;
 
-    const text = shortUrlElement.textContent;
+    const text = shortUrl.textContent;
+    const defaultText = copyButton.textContent;
 
     navigator.clipboard.writeText(text)
         .then(() => {
-            alert("Link copied to clipboard.");
+            copyButton.textContent = "Copied!";
+            copyButton.disabled = true;
+
+            setTimeout(() => {
+                copyButton.textContent = defaultText;
+                copyButton.disabled = false;
+            }, 1500);
         })
         .catch(() => {
-            alert("Failed to copy link.");
+            copyButton.textContent = "Error";
+
+            setTimeout(() => {
+                copyButton.textContent = defaultText;
+            }, 1500);
         });
 }
