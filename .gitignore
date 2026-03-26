@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+url_shortener.db
+.idea/
+.vscode/
