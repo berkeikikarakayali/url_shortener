@@ -11,7 +11,10 @@ class ShortenerService:
     @staticmethod
     async def generate_unique_code(db: AsyncSession) -> str:
         while True:
-            code = nanoid.generate(ShortenerService.ALPHABET, ShortenerService.CODE_LENGTH)
+            code = nanoid.generate(
+                ShortenerService.ALPHABET,
+                ShortenerService.CODE_LENGTH
+            )
 
             result = await db.execute(
                 select(ShortenedURL).where(ShortenedURL.short_code == code)
@@ -42,3 +45,9 @@ class ShortenerService:
             select(ShortenedURL).where(ShortenedURL.short_code == short_code)
         )
         return result.scalar_one_or_none()
+
+    @staticmethod
+    async def increment_click_count(db: AsyncSession, url: ShortenedURL):
+        url.total_clicks += 1
+        await db.commit()
+        await db.refresh(url)
