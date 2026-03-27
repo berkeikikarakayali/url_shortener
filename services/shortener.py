@@ -51,3 +51,16 @@ class ShortenerService:
         url.total_clicks += 1
         await db.commit()
         await db.refresh(url)
+
+    @staticmethod
+    async def get_total_links(db: AsyncSession) -> int:
+        result = await db.execute(select(ShortenedURL))
+        urls = result.scalars().all()
+        return len(urls)
+
+    @staticmethod
+    async def get_recent_urls(db: AsyncSession, limit: int = 5) -> list[ShortenedURL]:
+        result = await db.execute(
+            select(ShortenedURL).order_by(ShortenedURL.created_at.desc()).limit(limit)
+        )
+        return result.scalars().all()

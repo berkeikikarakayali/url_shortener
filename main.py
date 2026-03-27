@@ -27,26 +27,95 @@ async def startup():
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, db: AsyncSession = Depends(get_db)):
+    total_links = await ShortenerService.get_total_links(db)
+    total_clicks = await AnalyticsService.get_total_clicks(db)
+    recent_urls = await ShortenerService.get_recent_urls(db)
+
+    recent_links = []
+    for url in recent_urls:
+        recent_links.append({
+            "short_code": url.short_code,
+            "short_url": f"{BASE_URL}/{url.short_code}",
+            "original_url": url.original_url,
+            "total_clicks": url.total_clicks
+        })
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"request": request}
+        context={
+            "request": request,
+            "total_links": total_links,
+            "total_clicks": total_clicks,
+            "recent_links": recent_links
+        }
     )
 
 
-@app.post("/shorten")
-async def shorten_url(original_url: str, db: AsyncSession = Depends(get_db)):
-    if not original_url.startswith(("http://", "https://")):
-        original_url = "https://" + original_url
+@app.post("/shorten-form", response_class=HTMLResponse)
+async def shorten_url_form(
+    request: Request,
+    original_url: str = Form(...),
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        if not original_url.startswith(("http://", "https://")):
+            original_url = "https://" + original_url
 
-    new_url = await ShortenerService.create_short_url(db, original_url)
+        new_url = await ShortenerService.create_short_url(db, original_url)
 
-    return {
-        "original_url": new_url.original_url,
-        "short_code": new_url.short_code,
-        "short_url": f"{BASE_URL}/{new_url.short_code}"
-    }
+        total_links = await ShortenerService.get_total_links(db)
+        total_clicks = await AnalyticsService.get_total_clicks(db)
+        recent_urls = await ShortenerService.get_recent_urls(db)
+
+        recent_links = []
+        for url in recent_urls:
+            recent_links.append({
+                "short_code": url.short_code,
+                "short_url": f"{BASE_URL}/{url.short_code}",
+                "original_url": url.original_url,
+                "total_clicks": url.total_clicks
+            })
+
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "request": request,
+                "short_url": f"{BASE_URL}/{new_url.short_code}",
+                "original_url": new_url.original_url,
+                "short_code": new_url.short_code,
+                "total_links": total_links,
+                "total_clicks": total_clicks,
+                "recent_links": recent_links
+            }
+        )
+    except Exception as e:
+        total_links = await ShortenerService.get_total_links(db)
+        total_clicks = await AnalyticsService.get_total_clicks(db)
+        recent_urls = await ShortenerService.get_recent_urls(db)
+
+        recent_links = []
+        for url in recent_urls:
+            recent_links.append({
+                "short_code": url.short_code,
+                "short_url": f"{BASE_URL}/{url.short_code}",
+                "original_url": url.original_url,
+                "total_clicks": url.total_clicks
+            })
+
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "request": request,
+                "error": f"Something went wrong: {str(e)}",
+                "total_links": total_links,
+                "total_clicks": total_clicks,
+                "recent_links": recent_links
+            }
+        )
 
 
 @app.post("/shorten-form", response_class=HTMLResponse)

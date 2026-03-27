@@ -41,6 +41,42 @@
                 {{ error }}
             </div>
             {% endif %}
+
+            <div class="summary-box">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <h3>{{ total_links or 0 }}</h3>
+                        <p>Total Links</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>{{ total_clicks or 0 }}</h3>
+                        <p>Total Clicks</p>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Recent Links</h2>
+
+                {% if recent_links %}
+                    <div class="recent-links">
+                        {% for link in recent_links %}
+                        <div class="recent-link-item">
+                            <a href="{{ link.short_url }}" target="_blank">{{ link.short_url }}</a>
+                            <p>{{ link.original_url }}</p>
+
+                            <div class="recent-link-footer">
+                                <span>{{ link.total_clicks }} clicks</span>
+                                <a href="/stats/{{ link.short_code }}" target="_blank" class="mini-stats-btn">
+                                    View Stats
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-text">No links yet.</p>
+                {% endif %}
+            </div>
+
         </div>
     </div>
 

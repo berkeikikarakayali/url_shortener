@@ -35,3 +35,9 @@ class AnalyticsService:
             select(ClickEvent).where(ClickEvent.url_id == url_id)
         )
         return result.scalars().all()
+
+    @staticmethod
+    async def get_total_clicks(db: AsyncSession) -> int:
+        result = await db.execute(select(ClickEvent))
+        clicks = result.scalars().all()
+        return len(clicks)
