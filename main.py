@@ -57,13 +57,18 @@ async def home(request: Request, db: AsyncSession = Depends(get_db)):
 async def shorten_url_form(
     request: Request,
     original_url: str = Form(...),
+    custom_alias: str = Form(""),
     db: AsyncSession = Depends(get_db)
 ):
     try:
         if not original_url.startswith(("http://", "https://")):
             original_url = "https://" + original_url
 
-        new_url = await ShortenerService.create_short_url(db, original_url)
+        alias = custom_alias.strip() if custom_alias else None
+        if alias == "":
+            alias = None
+
+        new_url = await ShortenerService.create_short_url(db, original_url, alias)
 
         total_links = await ShortenerService.get_total_links(db)
         total_clicks = await AnalyticsService.get_total_clicks(db)
@@ -118,41 +123,12 @@ async def shorten_url_form(
         )
 
 
-@app.post("/shorten-form", response_class=HTMLResponse)
-async def shorten_url_form(
+@app.get("/stats/{short_code}", response_class=HTMLResponse)
+async def get_url_stats(
     request: Request,
-    original_url: str = Form(...),
+    short_code: str,
     db: AsyncSession = Depends(get_db)
 ):
-    try:
-        if not original_url.startswith(("http://", "https://")):
-            original_url = "https://" + original_url
-
-        new_url = await ShortenerService.create_short_url(db, original_url)
-
-        return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request,
-            "short_url": f"{BASE_URL}/{new_url.short_code}",
-            "original_url": new_url.original_url,
-            "short_code": new_url.short_code
-        }
-    )
-    except Exception as e:
-        return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request,
-            "error": f"Bir hata oluştu: {str(e)}"
-        }
-    )
-
-
-@app.get("/stats/{short_code}", response_class=HTMLResponse)
-async def get_url_stats(request: Request, short_code: str, db: AsyncSession = Depends(get_db)):
     url = await ShortenerService.get_by_code(db, short_code)
 
     if not url:

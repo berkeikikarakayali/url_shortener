@@ -25,8 +25,22 @@ class ShortenerService:
                 return code
 
     @staticmethod
-    async def create_short_url(db: AsyncSession, original_url: str) -> ShortenedURL:
-        short_code = await ShortenerService.generate_unique_code(db)
+    async def create_short_url( db: AsyncSession, original_url: str, custom_alias: str | None = None ) -> ShortenedURL:
+        if custom_alias:
+            if " " in custom_alias:
+                raise ValueError("Alias cannot contain spaces.")
+
+            result = await db.execute(
+                select(ShortenedURL).where(ShortenedURL.short_code == custom_alias)
+            )
+            existing = result.scalar_one_or_none()
+
+            if existing:
+                raise ValueError("This alias is already in use.")
+
+            short_code = custom_alias
+        else:
+            short_code = await ShortenerService.generate_unique_code(db)
 
         new_url = ShortenedURL(
             original_url=original_url,
