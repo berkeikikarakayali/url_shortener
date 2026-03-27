@@ -78,3 +78,15 @@ class ShortenerService:
             select(ShortenedURL).order_by(ShortenedURL.created_at.desc()).limit(limit)
         )
         return result.scalars().all()
+
+
+    @staticmethod
+    async def delete_by_code(db: AsyncSession, short_code: str) -> bool:
+        url = await ShortenerService.get_by_code(db, short_code)
+
+        if not url:
+            return False
+
+        await db.delete(url)
+        await db.commit()
+        return True

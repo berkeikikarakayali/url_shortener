@@ -190,3 +190,12 @@ async def redirect_to_original(
     await ShortenerService.increment_click_count(db, url)
 
     return RedirectResponse(url=url.original_url, status_code=307)
+
+@app.post("/delete/{short_code}")
+async def delete_link(short_code: str, db: AsyncSession = Depends(get_db)):
+    deleted = await ShortenerService.delete_by_code(db, short_code)
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    return RedirectResponse(url="/", status_code=303)

@@ -288,3 +288,28 @@ h1 {
 .mini-stats-btn:hover {
     background-color: #333;
 }
+
+.recent-link-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.delete-form {
+    margin: 0;
+}
+
+.delete-btn {
+    border: 1px solid #6a2b2b;
+    background-color: #3a1f1f;
+    color: #ffb3b3;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.delete-btn:hover {
+    background-color: #4a2525;
+}
